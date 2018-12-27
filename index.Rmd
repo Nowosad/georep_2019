@@ -1,6 +1,6 @@
 ---
 title: "Reproduciable spatial data analysis:"
-subtitle: "Example of urban transportation in Bristol"
+subtitle: "An example of transportation in Bristol"
 author: "Jakub Nowosad <br>https://nowosad.github.io"
 date: "Collegium Da Vinci, 2019-01-29, Poznań"
 output:
@@ -155,25 +155,64 @@ class: inverse, center, middle
 # Analiza transportu
 
 ---
-# Analiza transportu
+# Introduction
 
-.pull-left[
-```{r, echo=FALSE, out.height=550}
-knitr::include_graphics("figs/desire-1.png", dpi = NA)
-```
-]
+<!-- about transportation -->
 
-.pull-right[
-- Umiejętności tworzenia analiz przestrzennych mogą (powinny?) służyć rozwiązywaniom prawdziwych problemów.
-- Książka zawiera trzy praktyczne przykłady - analizę transportu, geomarketingową oraz ekologiczną.
-- Analiza transportu: w jaki sposób zwiększyć udział ruchu rowerowego w mieście Bristol?
-- Taka analiza obejmuje:
+---
+# Introduction
 
-    - Jednostki powierzchniowe
-    - Linie celu
-    - Trasy
-    - Węzły
-    - Sieci transportowe
+<!-- different geographic levels -->
+
+---
+# Bristol
+
+---
+# Aims
+
+<!-- explain our aim -->
+
+---
+# Transportation zones
+
+---
+# Desire lines
+
+---
+# Routes
+
+---
+# Nodes
+
+---
+# Route networks
+
+---
+# Prioritizing new infrastructure
+
+---
+# Future directions of travel
+
+---
+<!-- # Analiza transportu -->
+
+<!-- .pull-left[ -->
+<!-- ```{r, echo=FALSE, out.height=550} -->
+<!-- knitr::include_graphics("figs/desire-1.png", dpi = NA) -->
+<!-- ``` -->
+<!-- ] -->
+
+<!-- .pull-right[ -->
+<!-- - Umiejętności tworzenia analiz przestrzennych mogą (powinny?) służyć rozwiązywaniom prawdziwych problemów. -->
+<!-- - Książka zawiera trzy praktyczne przykłady - analizę transportu, geomarketingową oraz ekologiczną. -->
+<!-- - Analiza transportu: w jaki sposób zwiększyć udział ruchu rowerowego w mieście Bristol? -->
+<!-- - Taka analiza obejmuje: -->
+
+<!--     - Jednostki powierzchniowe -->
+<!--     - Linie celu -->
+<!--     - Trasy -->
+<!--     - Węzły -->
+<!--     - Sieci transportowe -->
 
 <!-- -    Areal units: transport patterns can be understood with reference to zonal aggregates such as the main mode of travel (by car, bike or foot, for example) and average distance of trips made by people living in a particular zone, covered in section 12.3. -->
 <!-- -    Desire lines: straight lines that represent ‘origin-destination’ data that records how many people travel (or could travel) between places (points or zones) in geographic space, the topic of section 12.4. -->
@@ -259,7 +298,7 @@ class: inverse, center, middle
 # Geocomputation with R 
 
 ---
-# Geocomputation with R - książka
+# The Geocomputation with R book
 
 .lc[
 ```{r, out.width=350, echo=FALSE}
@@ -283,7 +322,7 @@ knitr::include_graphics("figs/bc.png")
 <!-- more about open-source! -->
 
 ---
-# Geocomputation with R
+# The Geocomputation with R book
 
 
 .pull-left[
