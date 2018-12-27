@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Reproduciable spatial data analysis:</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Jakub Nowosad  https://nowosad.github.io" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <link href="libs/ionicons/css/ionicons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Reproduciable spatial data analysis:
+## Example of urban transportation in Bristol
+### Jakub Nowosad <br><a href="https://nowosad.github.io" class="uri">https://nowosad.github.io</a>
+### Collegium Da Vinci, 2019-01-29, Poznań
+
+---
+
+
+
+
+# Geocomputation
+
+&lt;!-- grass gis + arc + r --&gt;
+.pull-left[
+
+- Automatyzacja często powtarzalnych czynności
+- Przejrzystość i powtarzalność
+- Inspiracja do tworzenia oprogramowania poprzez dostarczanie narzędzi do modyfikowania istniejących i wdrażania nowych funkcji
+- Zachęcenie do dzielenia kodu i wyników oraz współpracy
+- Pomoc w rozwijaniu umiejętności programowania, na które istnieje duże zapotrzebowanie
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Cecha &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; GIS (GUI) &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; R (CLI) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Dyscyplina &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Geografia &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Statystyka, Informatyka &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sposób interakcji &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Graficzny interfejs użytkownika &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Wiersz poleceń &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Odtwarzalność &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Minimalna &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Maksymalna &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]
+&lt;!-- how and why --&gt;
+&lt;!-- packages and posibilities --&gt;
+&lt;!-- Facilitates the automation of repetitive tasks. --&gt;
+&lt;!-- Enables transparency and reproducibility, the backbone of good scientific practice and data science. --&gt;
+&lt;!-- Encourages software development by providing tools to modify existing functions and implement new ones. --&gt;
+&lt;!-- Helps develop future-proof programming skills which are in high demand in many disciplines and industries. --&gt;
+&lt;!-- Is user-friendly and fast, allowing an efficient workflow --&gt;
+
+ &lt;!-- This brings us to the ‘open source approach’, which has three main components: --&gt;
+
+ &lt;!--    A command-line interface (CLI), encouraging scripts recording geographic work to be shared and reproduced. --&gt;
+ &lt;!--    Open source software, which can be inspected and potentially improved by anyone in the world. --&gt;
+ &lt;!--    An active developer community, which collaborates and self-organizes to build complimentary and modular tools. --&gt;
+
+.pull-right[
+&lt;img src="figs/qgis.png" width="90%" style="display: block; margin: auto;" /&gt;&lt;img src="figs/r.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+# Geocomputation with R
+
+Ważna zaletą R (czy też np. Pythona) jest bycie językiem interpretowanym.
+Jest to szczególnie istotne w analizie danych (nie tylko) przestrzennych, bo pozwala na interaktywne programowanie - kod wpisany w konsoli jest natychmiast wykonywany a wynik jest wyświetlany (nie ma konieczności czekana na kompilację kodu).
+
+Pakiety R:
+
+- **sf**, **raster** - klasy obiektów przestrzennych
+- **dplyr**, **rmapshaper** - przetwarzanie tabel atrybutów/geometrii
+- **rnaturalearth**, **osmdata**, **getlandsat** - pobieranie danych przestrzennych
+- **rgrass7**, **RQGIS**, **RSAGA**, **link2GI** - łączenie z oprogramowaniem GIS
+- **gstat**, **mlr**, **CAST** - modelowanie danych przestrzennych
+- **rasterVis**, **tmap**, **ggplot** - wizualizacje statyczne
+- **leaflet**, **mapview**, **mapdeck** - wizualizacje interaktywne
+- wiele innych...
+
+Więcej na https://cran.r-project.org/web/views/Spatial.html.
+
+---
+class: inverse, center, middle
+# Basics
+
+---
+# R
+
+&lt;!-- - R + RStudio --&gt;
+&lt;!-- - Simple workflow - gif? --&gt;
+
+&lt;img src="figs/geocompr.gif" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+# Dane wektorowe
+
+
+
+.pull-left[
+&lt;img src="figs/sf-classes.png" height="550" style="display: block; margin: auto;" /&gt;
+]
+
+
+.pull-right[
+
+```r
+library(sf)
+head(seine)
+```
+
+```
+## Simple feature collection with 3 features and 1 field
+## geometry type:  MULTILINESTRING
+## dimension:      XY
+## bbox:           xmin: 518344.7 ymin: 6660431 xmax: 879955.3 ymax: 6938864
+## epsg (SRID):    2154
+## proj4string:    +proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+##    name                       geometry
+## 1 Marne MULTILINESTRING ((879955.3 ...
+## 2 Seine MULTILINESTRING ((828893.6 ...
+## 3 Yonne MULTILINESTRING ((773482.1 ...
+```
+
+&lt;!-- - Model wektorowy danych oparty jest na punktach położonych wewnątrz danego układu współrzędnych --&gt;
+
+- Pakiet **sf** zapewnia system klas dla danych wektorowych w R
+- Dodatkowo ten pakiet wykorzystując biblioteki PROJ, GDAL oraz GEOS pozwala na tranformacje pomiędzy układami przestrzennych, wczytywanie i zapis wielu formatów danych oraz wykonywanie operacji geometryczych
+&lt;!-- - Większość funkcji tego pakietu posiada intuicyjne nazwy zaczynające się of prefiksu `st_` --&gt;
+]
+
+---
+# Vector data
+
+&lt;!-- one more slide --&gt;
+
+---
+# Dane rastrowe
+
+.lc[
+- Pakiet **raster** zapewnia system klas dla danych rastrowych w R, składający się z prostych obiektów `RasterLayer` oraz wielowartwowych `RasterStack` oraz `RasterBrick`
+- Operacje na małych rastrach są wykonywane w pamięci RAM, a przetwarzanie większych rastrów odbywa się poprzez ich podzielenie na kawałki
+]
+
+.rc[
+&lt;img src="figs/raster-intro-plot-1.png" height="200" style="display: block; margin: auto;" /&gt;
+
+
+```r
+library(raster)
+elev
+```
+
+```
+## class       : RasterLayer 
+## dimensions  : 6, 6, 36  (nrow, ncol, ncell)
+## resolution  : 0.5, 0.5  (x, y)
+## extent      : -1.5, 1.5, -1.5, 1.5  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0 
+## data source : in memory
+## names       : layer 
+## values      : 1, 36  (min, max)
+```
+]
+
+---
+# Raster data
+
+&lt;!-- one more slide --&gt;
+
+---
+class: inverse, center, middle
+# Analiza transportu
+
+---
+# Analiza transportu
+
+.pull-left[
+&lt;img src="figs/desire-1.png" height="550" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+- Umiejętności tworzenia analiz przestrzennych mogą (powinny?) służyć rozwiązywaniom prawdziwych problemów.
+- Książka zawiera trzy praktyczne przykłady - analizę transportu, geomarketingową oraz ekologiczną.
+- Analiza transportu: w jaki sposób zwiększyć udział ruchu rowerowego w mieście Bristol?
+- Taka analiza obejmuje:
+
+    - Jednostki powierzchniowe
+    - Linie celu
+    - Trasy
+    - Węzły
+    - Sieci transportowe
+
+&lt;!-- -    Areal units: transport patterns can be understood with reference to zonal aggregates such as the main mode of travel (by car, bike or foot, for example) and average distance of trips made by people living in a particular zone, covered in section 12.3. --&gt;
+&lt;!-- -    Desire lines: straight lines that represent ‘origin-destination’ data that records how many people travel (or could travel) between places (points or zones) in geographic space, the topic of section 12.4. --&gt;
+&lt;!-- -    Routes: these are lines representing a path along the route network along the desire lines defined in the previous bullet point. We will see how to create them in section 12.5. --&gt;
+&lt;!-- -    Nodes: these are points in the transport system that can represent common origins and destinations and public transport stations such as bus stops and rail stations, the topic of section 12.6. --&gt;
+&lt;!-- -    Route networks: these represent the system of roads, paths and other linear features in an area and are covered in section 12.7. They can be represented as geographic features (representing route segments) or structured as an interconnected graph, with the level of traffic on different segments referred to as ‘flow’ by transport modelers (Hollander 2016). --&gt;
+]
+
+
+---
+class: inverse, center, middle
+# Analiza geomarketingowa
+
+---
+# Analiza geomarketingowa
+
+- Przykładem analizy geomarketingowej jest określenie lokalizacji nowego sklepu, która zachęci jak najwięcej klientów i w efekcie da największy zysk.
+- Te techniki mogą być też użyte do niekomercyjnych celów, np. lokalizacji placówek służby zdrowia.
+- Typowe pytania zadawane w trakcie takiej analizy to, między innymi, jaka jest grupa docelowa i gdzie ona mieszka/często przebywa; gdzie zlokalizowana jest potencjalna konkurencja? 
+
+&lt;!-- - A typical example is where to locate a new shop. The aim here is to attract most visitors and, ultimately, make most profit. There are also many non-commercial applications that can use the technique for public benefit, for example where to locate new health services --&gt;
+&lt;!-- - The main task of location analysis is to find out where such ‘optimal locations’ are for specific services, based on available data. Typical research questions include: --&gt;
+
+&lt;!-- -    Where do target groups live and which areas do they frequent? --&gt;
+&lt;!-- -    Where are competing stores or services located? --&gt;
+&lt;!-- -    How many people can easily reach specific stores? --&gt;
+&lt;!-- -    Do existing services over or under-exploit the market potential? --&gt;
+&lt;!-- -    What is the market share of a company in a specific area? --&gt;
+
+&lt;!-- This chapter demonstrates how geocomputation can answer such questions based on a hypothetical case study based on real data. --&gt;
+
+
+&lt;!-- -    Tidy the input data from the German census (section 13.3). --&gt;
+&lt;!-- -    Convert the tabulated census data into raster objects (section 13.4). --&gt;
+&lt;!-- -    Identify metropolitan areas with high population densities (section 13.5). --&gt;
+&lt;!-- -    Download detailed geographic data (from OpenStreetMap, with osmdata) for these areas (section 13.6). --&gt;
+&lt;!-- -    Create rasters for scoring the relative desirability of different locations using map algebra (section 13.7). --&gt;
+
+&lt;img src="figs/08_census_stack.png" height="400" style="display: block; margin: auto;" /&gt;
+
+---
+# Analiza geomarketingowa
+
+.pull-left[
+- Odpowiedź na takie pytania można uzyskać, na przykład, poprzez:
+    - Wyczyszczenie dostępnych danych ze spisu powszechnego
+    - Przetworzenie danych ze spisu do formy rastrowej
+    - Określenie obszarów metropolitalnych z dużym zagęszczeniem populacji
+    - Pobranie szczegółowych danych przestrzennych (np. z OpenStreetMap) dla tych obszarów
+    - Stworzenie rastrów oceniających względną atrakcyjność różnych lokalizacji
+]
+
+.pull-right[
+
+&lt;img src="figs/08_metro_areas.png" height="550" style="display: block; margin: auto;" /&gt;
+]
+&lt;!-- This chapter demonstrates how geocomputation can answer such questions based on a hypothetical case study based on real data. --&gt;
+
+
+&lt;!-- -    Tidy the input data from the German census (section 13.3). --&gt;
+&lt;!-- -    Convert the tabulated census data into raster objects (section 13.4). --&gt;
+&lt;!-- -    Identify metropolitan areas with high population densities (section 13.5). --&gt;
+&lt;!-- -    Download detailed geographic data (from OpenStreetMap, with osmdata) for these areas (section 13.6). --&gt;
+&lt;!-- -    Create rasters for scoring the relative desirability of different locations using map algebra (section 13.7). --&gt;
+
+
+
+---
+# Analiza geomarketingowa
+
+Wybrane obszary zgodnie z hipotetycznym scenariuszem tworzenia sklepu rowerowego w Berlinie.
+
+&lt;img src="figs/08_result.png" height="500" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse, center, middle
+# Geocomputation with R 
+
+---
+# Geocomputation with R - książka
+
+.lc[
+&lt;img src="figs/bc.png" width="350" style="display: block; margin: auto;" /&gt;
+]
+
+.rc[
+&gt; Lovelace R., Nowosad J., Muenchow J. 2019, **Geocomputation with R**. CRC Press
+
+- Wersja online, dostępna dla wszystkich, znajduje się pod adresem https://geocompr.robinlovelace.net/
+&lt;!-- każdy może dodać/zmienić/zaproponować coś--&gt;
+- Papierowa wersja książki zostanie opublikowana w wydawnictwie CRC Press na początku 2019 roku (http://bit.ly/geocomp_with_r)
+&lt;br&gt;
+
+
+]
+
+&lt;!-- intro to the book --&gt;
+&lt;!-- links--&gt;
+&lt;!-- more about open-source! --&gt;
+
+---
+# Geocomputation with R
+
+
+.pull-left[
+
+**Piętnaście rozdziałów** od wprowadzenia do obiektów przestrzennych w R, poprzez podstawowe operacje przestrzenne, wizualizacje, łączenie z oprogramowaniem GIS, uczenie maszynowe, tworzenie funkcji przestrzennych, a skończywszy na przykładach zastosowania.
+
+&lt;img src="figs/authors-in-czech-republic.jpg" height="375" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+**Aktywne przeczytanie tej książki zachęca do:**
+
+- Kreatywnego wykorzystania danych przestrzennych
+- Zastosowania umiejętności do prawdziwych problemów
+- Tworzenia nowych narzędzi
+- Dbania o odtwarzalność wyników
+
+**Co dalej?**
+
+- Rozwijanie wiedzy na temat R
+- Odkrywanie przetwarzania danych przestrzennych w innych językach programowania
+- Eksplorowanie i uczenie się nowych technik i metod
+]
+
+
+
+---
+class: inverse, center, middle
+# Podsumowanie
+
+---
+# Podsumowanie
+
+---
+class: center, middle
+&lt;!-- # Dziękuję --&gt;
+
+.pull-left[
+## O mnie:
+
+Twitter: <i class="ion  ion-social-twitter "></i> jakub_nowosad
+
+Email: nowosad.jakub@gmail.com
+]
+
+.pull-right[
+## Więcej informacji:
+
+https://nowosad.github.io
+
+https://geocompr.github.io/
+
+]
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
