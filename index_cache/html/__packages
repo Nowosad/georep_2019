@@ -1,0 +1,10 @@
+base
+sf
+tmap
+spData
+sp
+raster
+dplyr
+spDataLarge
+stplanr
+bindrcpp

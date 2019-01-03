@@ -16,19 +16,13 @@ output:
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
-knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.align = "center", cache = TRUE)
 ```
 
+# Spatial data analysis
 
-# Geocomputation
-
-<!-- what the hell is that? -->
-
----
-# Geocomputation
-
-<!-- grass gis + arc + r -->
 .pull-left[
+- Traditionally spatial analysis is done using a desktop Geographic Information System (GIS) such as QGIS, ArcMap, GRASS or SAGA
 
 ```{r gdsl, echo=FALSE, message=FALSE, results='asis'}
 d = readr::read_csv('"Attribute","Desktop GIS (GUI)","R"
@@ -39,7 +33,6 @@ knitr::kable(x = d,
              booktabs = TRUE, 
              format = "html")
 ```
-
 ]
 
 .pull-right[
@@ -51,15 +44,21 @@ knitr::include_graphics(c("figs/qgis.png", "figs/r.png"))
 ---
 # Geocomputation
 
-<!-- how and why -->
-<!-- packages and posibilities -->
-
 .pull-left[
+Geocomputation:
+
 - Facilitates the automation of repetitive tasks
 - Enables transparency and reproducibility, the backbone of good scientific practice and data science
 - Encourages software development by providing tools to modify existing functions and implement new ones
 - Helps develop future-proof programming skills which are in high demand in many disciplines and industries
 - Is user-friendly and fast, allowing an efficient workflow
+
+]
+
+.pull-right[
+```{r, echo=FALSE, out.width="90%"}
+knitr::include_graphics(c("figs/qgis.png", "figs/r.png"))
+```
 ]
 
 ---
@@ -94,11 +93,6 @@ knitr::include_graphics("figs/geocompr.gif")
 ---
 # Vector data
 
-
-```{r, echo=FALSE}
-library(spData)
-```
-
 .pull-left[
 ```{r, echo=FALSE, out.height=550}
 knitr::include_graphics("figs/sf-classes.png", dpi = NA)
@@ -108,10 +102,10 @@ knitr::include_graphics("figs/sf-classes.png", dpi = NA)
 
 .pull-right[
 Examples:
-- 1
-- 2
-- 3
-- 4
+- Location of a building
+- Road
+- River
+- Administrative unit
 ]
 
 ---
@@ -119,10 +113,12 @@ Examples:
 
 .pull-left[
 ```{r,echo=FALSE, message=FALSE}
+library(spData)
 library(sf)
 library(tmap)
+tmap_mode("view")
 tm_shape(seine) + 
-  tm_lines("name", palette = "Set2", lwd = 3)
+    tm_lines("name", palette = "Set2", lwd = 3, title.col = "River name:")
 ```
 
 ]
@@ -200,11 +196,11 @@ The geographic analysis of transport systems could be done at different geograph
 # Bristol
 
 .pull-left[
-- Typically, models are designed to solve a particular problem.
-- Bristol, a city in the west of England, around 30 km east of the Welsh capital Cardiff.
-- Bristol is the 10th largest city council in England, with a population of half a million people
-- In terms of transport, Bristol is well served by rail and road links, and has a relatively high level of active travel. 19% of its citizens cycle and 88% walk at least once per month according to the Active People Survey (the national average is 15% and 81%, respectively). 8% of the population said they cycled work in the 2011 census, compared with only 3% nationwide.
-- Despite impressive walking and cycling statistics, the city has a major congestion problem. Part of the solution is to continue to increase the proportion of trips made by cycling. 
+Typically, models are designed to solve a particular problem.
+- **Bristol - a city in the west of England with a population of half a million people**
+- In terms of transport, Bristol is well served by rail and road links, and has a relatively high level of active travel. 19% of its citizens cycle and 88% walk at least once per month according to the Active People Survey (the national average is 15% and 81%, respectively).
+- 8% of the population said they cycled work in the 2011 census, compared with only 3% nationwide
+- Despite impressive walking and cycling statistics, **the city has a major congestion problem**
 ]
 
 .pull-right[
@@ -217,14 +213,14 @@ knitr::include_graphics("figs/bristol.png", dpi = NA)
 # Aims
 
 .pull-left[
-- For this reason, this chapter is based around a policy scenario, introduced in the next section, that asks: how to increase cycling in the city of Bristol? 
+- For this reason, the question is **how best to increase the share of walking and cycling in the city of Bristol?**
 
-Beyond demonstrating how geocomputation with R can be used to support sustainable transport planning, is to provide evidence for decision-makers in Bristol to decide how best to increase the share of walking and cycling in particular in the city. This high-level aim will be met via the following objectives:
+This high-level aim will be met via the following objectives:
 
-- Describe the geographical pattern of transport behavior in the city.
-- Identify key public transport nodes and routes along which cycling to rail stations could be encouraged, as the first stage in multi-model trips.
-- Analyze travel ‘desire lines’ to, to find where many people drive short distances.
-- Identify cycle route locations that will encourage less car driving and more cycling.
+- Describe the geographical pattern of transport behavior in the city
+- Identify key public transport nodes and routes along which cycling to rail stations could be encouraged, as the first stage in multi-model trips
+- Analyze travel ‘desire lines’ to, to find where many people drive short distances
+- Identify cycle route locations that will encourage less car driving and more cycling
 ]
 
 .pull-right[
@@ -237,23 +233,28 @@ knitr::include_graphics("figs/bristol.png", dpi = NA)
 # Setup
 
 ```{r, message=FALSE}
-library(sf)
-library(dplyr)
-library(spDataLarge)
-library(stplanr)      # geographic transport data package
+library(sf)           # spatial data classes
+library(dplyr)        # data manipulation
+library(spDataLarge)  # example datasets
+library(stplanr)      # transport planning
 library(tmap)         # visualization package
 ```
 
 ---
 # Transportation zones
 
-- Two zone types will typically be of particular interest: the study region and origin (typically residential areas) and destination (typically containing ‘trip attractors’ such as schools and shops) zones.
-- The origin and destination zones used in this chapter are the same: officially defined zones of intermediate geographic resolution (their official name is Middle layer Super Output Areas or MSOAs). Each houses around 8,000 people.
+Two zone types will typically be of particular interest:
+
+- **origin** (typically residential areas) zones
+- **destination** (typically containing ‘trip attractors’ such as offices, schools, and shops) zones
+
+The origin and destination zones used here are officially defined zones of intermediate geographic resolution (their official name is Middle layer Super Output Areas or MSOAs). Each houses around 8,000 people
 
 .lc[
-```{r, echo=FALSE, fig.height=8, message=FALSE}
+```{r, echo=FALSE, fig.height=7, message=FALSE}
+tmap_mode("plot")
 tm_shape(bristol_zones) +
-  tm_polygons(legend.show = FALSE, col = "MAP_COLORS", title = "")
+  tm_polygons(legend.show = FALSE, col = "MAP_COLORS")
 ```
 ]
 
@@ -293,9 +294,10 @@ zones_dest
 zones_origin = left_join(bristol_zones, zones_origin, by = "geo_code")
 ```
 
-```{r, echo=FALSE, fig.width=16}
+```{r, echo=FALSE, fig.width=16, message=FALSE}
 zones_od = inner_join(zones_origin, zones_dest,
                       by = "geo_code")
+tmap_mode("plot")
 tm_shape(zones_od) +
   tm_fill(
     c("all_origin", "all_dest"),
@@ -311,24 +313,30 @@ tm_shape(zones_od) +
 ---
 # Desire lines
 
-- Unlike zones, which represent trip origins and destinations, desire lines connect the centroid of the origin and the destination zone, and thereby represent where people desire to go between zones. They represent the quickest ‘bee line’ or ‘crow flies’ route between A and B that would be taken, if it were not for obstacles such as buildings and windy roads getting in the way
+- Unlike zones, which represent trip origins and destinations, **desire lines connect the centroid of the origin and the destination zone**, and thereby represent where people desire to go between zones
+- They represent the quickest ‘crow flies’ route between A and B that would be taken, if it were not for obstacles such as buildings and windy roads getting in the way
 
 ```{r, message=FALSE, warning=FALSE}
-bristol_od$Active = (bristol_od$bicycle + bristol_od$foot) /
-  bristol_od$all * 100
 od_inter = filter(bristol_od, o != d)
 desire_lines = od2line(od_inter, zones_od)
 ```
+
+```{r}
+bristol_od$Active = (bristol_od$bicycle + bristol_od$foot) / bristol_od$all * 100
+```
+
 
 ---
 # Desire lines
 
 .lc[
-The map shows that the city center dominates transport patterns in the region, suggesting policies should be prioritized there, although a number of peripheral sub-centers can also be seen. Next it would be interesting to have a look at the distribution of interzonal modes, e.g. between which zones is cycling the least or the most common means of transport. 
+- **The map shows that the city center dominates transport patterns in the region, suggesting policies should be prioritized there**, although a number of peripheral sub-centers can also be seen 
+- Next it would be interesting to have a look at the distribution of interzonal modes, e.g. between which zones is cycling the least mean of transport
 ]
 
 .rc[
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+tmap_mode("plot")
 tm_shape(desire_lines) +
   tm_lines(
     palette = "plasma",
@@ -349,83 +357,184 @@ tm_shape(desire_lines) +
 ---
 # Routes
 
-```{r}
+- **Routes are desire lines that are no longer straight**
+- **Routes are generated from desire lines** — or more commonly origin-destination pairs — **using routing services**
+- The benefits of cycling trips are greatest when they replace car trips
+- **5 km Euclidean distance (or around 6-8 km of route distance) can realistically be cycled by many people**
+- We will therefore only route desire lines along which a high (300+) number of car trips take place that are up to 5 km in distance:
+
+```{r, message=FALSE}
 desire_lines$distance = as.numeric(st_length(desire_lines))
 desire_carshort = dplyr::filter(desire_lines, car_driver > 300 & distance < 5000)
 route_carshort = line2route(desire_carshort, route_fun = route_osrm)
-desire_carshort$geom_car = st_geometry(route_carshort)
 ```
 
-```{r}
-mapview::mapview(desire_carshort$geom_car)
+---
+# Routes
+
+.pull-left[
+- Plotting the results shows that many short car trips take place in and around Bradley Stoke
+- Why? Bradley Stoke is “Europe’s largest new town built with private investment”, suggesting limited public transport provision
+- Furthermore, the town is surrounded by large (cycling unfriendly) road structures, “such as junctions on both the M4 and M5 motorways” 
+]
+
+.pull-right[
+```{r, message=FALSE, echo=FALSE}
+tmap_mode("view")
+desire_carshort$geom_car = st_geometry(route_carshort)
+tm_shape(desire_carshort$geom_car) + tm_lines()
 ```
+]
+---
+# Nodes
+
+.pull-left[
+- Nodes in geographic transport data are zero-dimensional features (points)
+There are two types of transport nodes:
+- From an active travel perspective, public transport ‘legs’ of longer journeys divide trips into three:
+
+   * **The origin leg**, typically from residential areas to public transport stations
+   * **The public transport leg**, which typically goes from the station nearest a trip’s origin to the station nearest its destination
+   * **The destination leg**, from the station of alighting to the destination
+]
+
+.pull-right[
+- We will use railway stations to illustrate public transport nodes
+
+```{r, echo=FALSE}
+tm_shape(bristol_stations) +
+  tm_symbols(col = "blue")
+```
+] 
+
+
+ 
+---
+# Nodes
+
+- As an example, we will select only the top three desire lines in terms of rails use:
+
+```{r}
+desire_rail = top_n(desire_lines, n = 3, wt = train)
+```
+
+<center>
+```{r, echo=FALSE, fig.align='center'}
+tm_shape(desire_rail) + tm_lines()
+```
+</center>
 
 ---
 # Nodes
 
-```{r}
-mapview::mapview(bristol_stations, legend = FALSE)
-```
-```{r}
-desire_rail = top_n(desire_lines, n = 3, wt = train)
-```
+- The challenge now is to ‘break-up’ each of these lines into three pieces, representing travel via public transport nodes:
 
 ```{r}
 desire_rail = line_via(desire_rail, bristol_stations)
 ```
 
-```{r}
-
+<center>
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+zone_cents = st_centroid(zones_od)
+zone_cents_rail = zone_cents[desire_rail, ]
+tmap_mode("view")
+tm_shape(bristol_stations, is.master = TRUE) +
+  tm_symbols(col = NA, shape = 19)+ 
+  tm_shape(zone_cents_rail) +
+  tm_symbols(col = "black", size = 0.25) +
+  tm_shape(desire_rail$geometry) +
+  tm_lines(col = "black") +
+  tm_shape(desire_rail$leg_orig) + 
+  tm_lines(col = "green") +  
+  tm_shape(desire_rail$leg_via) +
+  tm_lines(col = "grey") +  
+  tm_shape(desire_rail$leg_dest) +
+  tm_lines(col = "blue") 
 ```
+</center>
+---
+# Route networks
+
+- Route networks can usefully be represented as mathematical graphs, with nodes on the network connected by edges
+- As an example, we will select only the roads with maximum speed of 70 mph (~113 km/h) :
+
+```{r}
+ways_freeway = bristol_ways %>% filter(maxspeed == "70 mph") 
+```
+<center>
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+tm_shape(ways_freeway) +
+  tm_lines(col = "purple", lwd = 2)
+```
+</center>
 
 ---
 # Route networks
 
-```{r}
-summary(bristol_ways)
-ways_freeway = bristol_ways %>% filter(maxspeed == "70 mph") 
+- In the example below,below, the ‘edge betweenness’, meaning the number of shortest paths passing through each edge, is calculated:
+
+```
 ways_sln = SpatialLinesNetwork(ways_freeway)
+ways_sln@sl$e = igraph::edge_betweenness(ways_sln@g)
 ```
 
-```{r}
-ways_sln@sl$e = igraph::edge_betweenness(ways_sln@g)
+<center>
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 tmap_mode("view")
 tm_shape(ways_sln@sl) + 
   tm_lines(lwd = "e", scale = 25) +
   tm_layout(legend.show = FALSE)
 ```
-
+</center>
 
 ---
 # Prioritizing new infrastructure
 
+.pull-left[
 ```{r}
 route_rail = desire_rail %>% 
   st_set_geometry("leg_orig") %>% 
   line2route(route_fun = route_osrm) %>% 
   st_set_crs(4326)
 route_cycleway = rbind(route_rail, route_carshort)
-route_cycleway$all = c(desire_rail$all, desire_carshort$all)
+route_cycleway$all = c(desire_rail$all, 
+                       desire_carshort$all)
 ```
 
-```{r, eval=FALSE}
+- The results (blue lines) shows routes with high levels of car dependency and highlights opportunities for cycling rail stations
+]
+
+.pull-right[
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 bristol_stations_top = bristol_stations[desire_rail, , op = st_is_within_distance, dist = 500]
 tm_shape(bristol_ttwa) +
   tm_borders(col = "darkblue") +
   tm_shape(bristol_ways) +
-  tm_lines(col = "highway", lwd = 3, palette = c("lightgreen", "grey", "pink")) +
-  tm_scale_bar() +
+  tm_lines(col = "highway", lwd = 1, palette = c("lightgreen", "grey", "pink")) +
   tm_shape(route_cycleway) +
-  tm_lines(col = "blue", lwd = "all", scale = 20, alpha = 0.6) +
-  tm_shape(bristol_stations_top) +
-  tm_dots(size = 0.3, col = "red") +
+  tm_lines(col = "blue", lwd = "all", scale = 5, alpha = 0.6) +
+  tm_shape(zone_cents_rail) +
+  tm_symbols(col = "black", size = 0.25) +
+  tm_scale_bar() +
 tm_layout(legend.position = c("LEFT", "TOP"))
 ```
+]
 
 ---
 # Future directions of travel
 
-Methodologically, the foundations presented in this chapter could be extended by including more variables in the analysis. Characteristics of the route such as speed limits, busyness and the provision of protected cycling and walking paths could be linked to ‘mode-split’ (the proportion of trips made by different modes of transport). By aggregating OpenStreetMap data using buffers and geographic data methods presented in Chapters 3 and 4, for example, it would be possible to detect the presence of green space in close proximity to transport routes. Using R’s statistical modeling capabilities, this could then be used to predict current and future levels of cycling, for example.
+.pull-left[
+- The presented foundations presented be extended by including more variables in the analysis
+- Characteristics of the route such as speed limits, busyness and the provision of protected cycling and walking paths could be linked to the proportion of trips made by different modes of transport
+- By aggregating OpenStreetMap data using buffers and geographic data methods , it would be possible to detect the presence of green space in close proximity to transport routes
+- Using R’s statistical modeling capabilities, this could then be used to predict current and future levels of cycling, for example
+- This type of analysis underlies the Propensity to Cycle Tool (PCT), a publicly accessible (see www.pct.bike) mapping tool developed in R that is being used to prioritize investment in cycling across England 
+]
+.pull-right[
+```{r, echo=FALSE, out.height=550}
+knitr::include_graphics("figs/pct.png", dpi = NA)
+```
+]
 
 ---
 class: inverse, center, middle
@@ -484,8 +593,7 @@ knitr::include_graphics("figs/bc.png")
 ]
 
 .rc[
-
-**Fifteen chapters** starting from an introduction to spatial objects in R, going through basic spatial operations, visualizations, bridges with GIS software, spatial machine learning, creating spatial functions, and ending with case studies
+- **Fifteen chapters** starting from an introduction to spatial objects in R, going through basic spatial operations, visualizations, bridges with GIS software, spatial machine learning, creating spatial functions, and ending with case studies
 <br>
 
 > Lovelace R., Nowosad J., Muenchow J. 2019, **Geocomputation with R**. CRC Press
@@ -494,37 +602,6 @@ knitr::include_graphics("figs/bc.png")
 - This book has been also published by CRC Press (http://bit.ly/geocomp_with_r)
 <br>
 ]
-
----
-class: inverse, center, middle
-# Summary
-
----
-# Summary
-
-<!-- .pull-right[ -->
-<!-- **Aktywne przeczytanie tej książki zachęca do:** -->
-
-<!-- - Kreatywnego wykorzystania danych przestrzennych -->
-<!-- - Zastosowania umiejętności do prawdziwych problemów -->
-<!-- - Tworzenia nowych narzędzi -->
-<!-- - Dbania o odtwarzalność wyników -->
-
-<!-- **Co dalej?** -->
-
-<!-- - Rozwijanie wiedzy na temat R -->
-<!-- - Odkrywanie przetwarzania danych przestrzennych w innych językach programowania -->
-<!-- - Eksplorowanie i uczenie się nowych technik i metod -->
-<!-- ] -->
-
-.pull-right[
-This brings us to the ‘open source approach’, which has three main components:
-
-- A command-line interface (CLI), encouraging scripts recording geographic work to be shared and reproduced
-- Open source software, which can be inspected and potentially improved by anyone in the world
-- An active developer community, which collaborates and self-organizes to build complimentary and modular tools
-]
-
 
 ---
 class: center, middle
