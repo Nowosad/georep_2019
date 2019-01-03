@@ -19,41 +19,28 @@ options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(fig.align = "center")
 ```
 
+
+# Geocomputation
+
+<!-- what the hell is that? -->
+
+---
 # Geocomputation
 
 <!-- grass gis + arc + r -->
 .pull-left[
 
-- Automatyzacja często powtarzalnych czynności
-- Przejrzystość i powtarzalność
-- Inspiracja do tworzenia oprogramowania poprzez dostarczanie narzędzi do modyfikowania istniejących i wdrażania nowych funkcji
-- Zachęcenie do dzielenia kodu i wyników oraz współpracy
-- Pomoc w rozwijaniu umiejętności programowania, na które istnieje duże zapotrzebowanie
-
 ```{r gdsl, echo=FALSE, message=FALSE, results='asis'}
-d = readr::read_csv('"Cecha","GIS (GUI)","R (CLI)"
-"Dyscyplina","Geografia","Statystyka, Informatyka"
-"Sposób interakcji","Graficzny interfejs użytkownika","Wiersz poleceń"
-"Odtwarzalność","Minimalna","Maksymalna"')
+d = readr::read_csv('"Attribute","Desktop GIS (GUI)","R"
+"Home disciplines","Geography","Computing, Statistics"
+"Software focus","Graphical User Interface","Command line"
+"Reproducibility","Minimal","Maximal"')
 knitr::kable(x = d, 
              booktabs = TRUE, 
              format = "html")
 ```
 
 ]
-<!-- how and why -->
-<!-- packages and posibilities -->
-<!-- Facilitates the automation of repetitive tasks. -->
-<!-- Enables transparency and reproducibility, the backbone of good scientific practice and data science. -->
-<!-- Encourages software development by providing tools to modify existing functions and implement new ones. -->
-<!-- Helps develop future-proof programming skills which are in high demand in many disciplines and industries. -->
-<!-- Is user-friendly and fast, allowing an efficient workflow -->
-
- <!-- This brings us to the ‘open source approach’, which has three main components: -->
-
- <!--    A command-line interface (CLI), encouraging scripts recording geographic work to be shared and reproduced. -->
- <!--    Open source software, which can be inspected and potentially improved by anyone in the world. -->
- <!--    An active developer community, which collaborates and self-organizes to build complimentary and modular tools. -->
 
 .pull-right[
 ```{r, echo=FALSE, out.width="90%"}
@@ -62,23 +49,36 @@ knitr::include_graphics(c("figs/qgis.png", "figs/r.png"))
 ]
 
 ---
+# Geocomputation
+
+<!-- how and why -->
+<!-- packages and posibilities -->
+
+.pull-left[
+- Facilitates the automation of repetitive tasks
+- Enables transparency and reproducibility, the backbone of good scientific practice and data science
+- Encourages software development by providing tools to modify existing functions and implement new ones
+- Helps develop future-proof programming skills which are in high demand in many disciplines and industries
+- Is user-friendly and fast, allowing an efficient workflow
+]
+
+---
 # Geocomputation with R
 
-Ważna zaletą R (czy też np. Pythona) jest bycie językiem interpretowanym.
-Jest to szczególnie istotne w analizie danych (nie tylko) przestrzennych, bo pozwala na interaktywne programowanie - kod wpisany w konsoli jest natychmiast wykonywany a wynik jest wyświetlany (nie ma konieczności czekana na kompilację kodu).
+An important feature of R (and Python) is that it is an interpreted language. This is advantageous because it enables interactive programming in a Read–Eval–Print Loop (REPL): code entered into the console is immediately executed and the result is printed, rather than waiting for the intermediate stage of compilation. 
 
-Pakiety R:
+R packages:
 
-- **sf**, **raster** - klasy obiektów przestrzennych
-- **dplyr**, **rmapshaper** - przetwarzanie tabel atrybutów/geometrii
-- **rnaturalearth**, **osmdata**, **getlandsat** - pobieranie danych przestrzennych
-- **rgrass7**, **RQGIS**, **RSAGA**, **link2GI** - łączenie z oprogramowaniem GIS
-- **gstat**, **mlr**, **CAST** - modelowanie danych przestrzennych
-- **rasterVis**, **tmap**, **ggplot** - wizualizacje statyczne
-- **leaflet**, **mapview**, **mapdeck** - wizualizacje interaktywne
-- wiele innych...
+- **sf**, **raster** - spatial classes
+- **dplyr**, **rmapshaper** - processing of atttribute tables/geometries 
+- **rnaturalearth**, **osmdata**, **getlandsat** - spatial data download
+- **rgrass7**, **RQGIS**, **RSAGA**, **link2GI** - connecting with GIS software
+- **gstat**, **mlr**, **CAST** - spatial data modeling
+- **rasterVis**, **tmap**, **ggplot** - static visualizations
+- **leaflet**, **mapview**, **mapdeck** - interactive visualizations
+- many more...
 
-Więcej na https://cran.r-project.org/web/views/Spatial.html.
+Learn more at https://cran.r-project.org/web/views/Spatial.html.
 
 ---
 class: inverse, center, middle
@@ -87,15 +87,13 @@ class: inverse, center, middle
 ---
 # R
 
-<!-- - R + RStudio -->
-<!-- - Simple workflow - gif? -->
-
 ```{r, echo=FALSE, out.width="90%"}
 knitr::include_graphics("figs/geocompr.gif")
 ```
 
 ---
-# Dane wektorowe
+# Vector data
+
 
 ```{r, echo=FALSE}
 library(spData)
@@ -109,29 +107,54 @@ knitr::include_graphics("figs/sf-classes.png", dpi = NA)
 
 
 .pull-right[
-```{r, message=FALSE}
-library(sf)
-head(seine)
-```
-
-<!-- - Model wektorowy danych oparty jest na punktach położonych wewnątrz danego układu współrzędnych -->
-
-- Pakiet **sf** zapewnia system klas dla danych wektorowych w R
-- Dodatkowo ten pakiet wykorzystując biblioteki PROJ, GDAL oraz GEOS pozwala na tranformacje pomiędzy układami przestrzennych, wczytywanie i zapis wielu formatów danych oraz wykonywanie operacji geometryczych
-<!-- - Większość funkcji tego pakietu posiada intuicyjne nazwy zaczynające się of prefiksu `st_` -->
+Examples:
+- 1
+- 2
+- 3
+- 4
 ]
 
 ---
 # Vector data
 
-<!-- one more slide -->
+.pull-left[
+```{r,echo=FALSE, message=FALSE}
+library(sf)
+library(tmap)
+tm_shape(seine) + 
+  tm_lines("name", palette = "Set2", lwd = 3)
+```
+
+]
+
+.pull-right[
+
+```{r}
+library(sf)
+head(seine)
+```
+<!-- - Model wektorowy danych oparty jest na punktach położonych wewnątrz danego układu współrzędnych -->
+
+- The **sf** package provides a class system for spatial vector data 
+- Additionally, this package uses the PROJ, GDAL oraz GEOS libraries, which allows for transformation between different coordinate reference systems, reading and writing many spatial data file formats, and executing geometric operations
+]
 
 ---
-# Dane rastrowe
+# Raster data
+
+```{r, echo=FALSE, out.height=400}
+knitr::include_graphics("figs/raster-intro-plot2-1.png", dpi = NA)
+```
+
+- Raster maps usually represent continuous phenomena such as elevation, temperature, population density or spectral data
+- Of course, we can represent discrete features such as soil or land-cover classes also with the help of a raster data model
+
+---
+# Raster data
 
 .lc[
-- Pakiet **raster** zapewnia system klas dla danych rastrowych w R, składający się z prostych obiektów `RasterLayer` oraz wielowartwowych `RasterStack` oraz `RasterBrick`
-- Operacje na małych rastrach są wykonywane w pamięci RAM, a przetwarzanie większych rastrów odbywa się poprzez ich podzielenie na kawałki
+- The **raster** package provides a class system for spatial raster data, which constits of simple `RasterLayer`, and multilayer `RasterStack` and `RasterBrick`
+- Operations on small raster are executed in RAM, and there is also a possibility of processing of large rasters by dividing them into smaller chunks
 ]
 
 .rc[
@@ -146,13 +169,8 @@ elev
 ]
 
 ---
-# Raster data
-
-<!-- one more slide -->
-
----
 class: inverse, center, middle
-# Analiza transportu
+# Transportation analysis
 
 ---
 # Introduction
@@ -194,7 +212,6 @@ class: inverse, center, middle
 # Future directions of travel
 
 ---
-<!-- # Analiza transportu -->
 
 <!-- .pull-left[ -->
 <!-- ```{r, echo=FALSE, out.height=550} -->
@@ -224,47 +241,29 @@ class: inverse, center, middle
 
 ---
 class: inverse, center, middle
-# Analiza geomarketingowa
+# Geomarketing
 
 ---
-# Analiza geomarketingowa
+# Geomarketing
 
-- Przykładem analizy geomarketingowej jest określenie lokalizacji nowego sklepu, która zachęci jak najwięcej klientów i w efekcie da największy zysk.
-- Te techniki mogą być też użyte do niekomercyjnych celów, np. lokalizacji placówek służby zdrowia.
-- Typowe pytania zadawane w trakcie takiej analizy to, między innymi, jaka jest grupa docelowa i gdzie ona mieszka/często przebywa; gdzie zlokalizowana jest potencjalna konkurencja? 
-
-<!-- - A typical example is where to locate a new shop. The aim here is to attract most visitors and, ultimately, make most profit. There are also many non-commercial applications that can use the technique for public benefit, for example where to locate new health services -->
-<!-- - The main task of location analysis is to find out where such ‘optimal locations’ are for specific services, based on available data. Typical research questions include: -->
-
-<!-- -    Where do target groups live and which areas do they frequent? -->
-<!-- -    Where are competing stores or services located? -->
-<!-- -    How many people can easily reach specific stores? -->
-<!-- -    Do existing services over or under-exploit the market potential? -->
-<!-- -    What is the market share of a company in a specific area? -->
-
-<!-- This chapter demonstrates how geocomputation can answer such questions based on a hypothetical case study based on real data. -->
-
-
-<!-- -    Tidy the input data from the German census (section 13.3). -->
-<!-- -    Convert the tabulated census data into raster objects (section 13.4). -->
-<!-- -    Identify metropolitan areas with high population densities (section 13.5). -->
-<!-- -    Download detailed geographic data (from OpenStreetMap, with osmdata) for these areas (section 13.6). -->
-<!-- -    Create rasters for scoring the relative desirability of different locations using map algebra (section 13.7). -->
+- Typical example is where to locate a new shop. The aim here is to attract most visitors and, ultimately, make most profit
+- There are also many non-commercial applications that can use the technique for public benefit, for example where to locate new health services
+- Typical research questions include what are the target groups, where do target groups live and which areas do they frequent, where are competing stores or services located?
 
 ```{r, echo=FALSE, out.height=400}
 knitr::include_graphics("figs/08_census_stack.png", dpi = NA)
 ```
 
 ---
-# Analiza geomarketingowa
+# Geomarketing
 
 .pull-left[
-- Odpowiedź na takie pytania można uzyskać, na przykład, poprzez:
-    - Wyczyszczenie dostępnych danych ze spisu powszechnego
-    - Przetworzenie danych ze spisu do formy rastrowej
-    - Określenie obszarów metropolitalnych z dużym zagęszczeniem populacji
-    - Pobranie szczegółowych danych przestrzennych (np. z OpenStreetMap) dla tych obszarów
-    - Stworzenie rastrów oceniających względną atrakcyjność różnych lokalizacji
+- To answer such questions you can:
+    - Tidy the input data from a census
+    - Convert the tabulated census data into raster objects
+    - Identify metropolitan areas with high population densities
+    - Download detailed geographic data (from OpenStreetMap, with `osmdata`) for these areas
+    - Create rasters for scoring the relative desirability of different locations using map algebra
 ]
 
 .pull-right[
@@ -273,21 +272,11 @@ knitr::include_graphics("figs/08_census_stack.png", dpi = NA)
 knitr::include_graphics("figs/08_metro_areas.png", dpi = NA)
 ```
 ]
-<!-- This chapter demonstrates how geocomputation can answer such questions based on a hypothetical case study based on real data. -->
-
-
-<!-- -    Tidy the input data from the German census (section 13.3). -->
-<!-- -    Convert the tabulated census data into raster objects (section 13.4). -->
-<!-- -    Identify metropolitan areas with high population densities (section 13.5). -->
-<!-- -    Download detailed geographic data (from OpenStreetMap, with osmdata) for these areas (section 13.6). -->
-<!-- -    Create rasters for scoring the relative desirability of different locations using map algebra (section 13.7). -->
-
-
 
 ---
-# Analiza geomarketingowa
+# Geomarketing
 
-Wybrane obszary zgodnie z hipotetycznym scenariuszem tworzenia sklepu rowerowego w Berlinie.
+<center>Suitable areas in accordance with our hypothetical survey for bike stores in Berlin</center>
 
 ```{r, echo=FALSE, out.height=500}
 knitr::include_graphics("figs/08_result.png", dpi = NA)
@@ -307,63 +296,54 @@ knitr::include_graphics("figs/bc.png")
 ]
 
 .rc[
-> Lovelace R., Nowosad J., Muenchow J. 2019, **Geocomputation with R**. CRC Press
 
-- Wersja online, dostępna dla wszystkich, znajduje się pod adresem https://geocompr.robinlovelace.net/
-<!-- każdy może dodać/zmienić/zaproponować coś-->
-- Papierowa wersja książki zostanie opublikowana w wydawnictwie CRC Press na początku 2019 roku (http://bit.ly/geocomp_with_r)
+**Fifteen chapters** starting from an introduction to spatial objects in R, going through basic spatial operations, visualizations, bridges with GIS software, spatial machine learning, creating spatial functions, and ending with case studies
 <br>
 
+> Lovelace R., Nowosad J., Muenchow J. 2019, **Geocomputation with R**. CRC Press
 
+- The online version of this book is free to read at https://geocompr.robinlovelace.net/
+- This book has been also published by CRC Press (http://bit.ly/geocomp_with_r)
+<br>
 ]
-
-<!-- intro to the book -->
-<!-- links-->
-<!-- more about open-source! -->
-
----
-# The Geocomputation with R book
-
-
-.pull-left[
-
-**Piętnaście rozdziałów** od wprowadzenia do obiektów przestrzennych w R, poprzez podstawowe operacje przestrzenne, wizualizacje, łączenie z oprogramowaniem GIS, uczenie maszynowe, tworzenie funkcji przestrzennych, a skończywszy na przykładach zastosowania.
-
-```{r, echo=FALSE, out.height=375}
-knitr::include_graphics("figs/authors-in-czech-republic.jpg", dpi = NA)
-```
-]
-
-.pull-right[
-**Aktywne przeczytanie tej książki zachęca do:**
-
-- Kreatywnego wykorzystania danych przestrzennych
-- Zastosowania umiejętności do prawdziwych problemów
-- Tworzenia nowych narzędzi
-- Dbania o odtwarzalność wyników
-
-**Co dalej?**
-
-- Rozwijanie wiedzy na temat R
-- Odkrywanie przetwarzania danych przestrzennych w innych językach programowania
-- Eksplorowanie i uczenie się nowych technik i metod
-]
-
-
 
 ---
 class: inverse, center, middle
-# Podsumowanie
+# Summary
 
 ---
-# Podsumowanie
+# Summary
+
+<!-- .pull-right[ -->
+<!-- **Aktywne przeczytanie tej książki zachęca do:** -->
+
+<!-- - Kreatywnego wykorzystania danych przestrzennych -->
+<!-- - Zastosowania umiejętności do prawdziwych problemów -->
+<!-- - Tworzenia nowych narzędzi -->
+<!-- - Dbania o odtwarzalność wyników -->
+
+<!-- **Co dalej?** -->
+
+<!-- - Rozwijanie wiedzy na temat R -->
+<!-- - Odkrywanie przetwarzania danych przestrzennych w innych językach programowania -->
+<!-- - Eksplorowanie i uczenie się nowych technik i metod -->
+<!-- ] -->
+
+.pull-right[
+This brings us to the ‘open source approach’, which has three main components:
+
+- A command-line interface (CLI), encouraging scripts recording geographic work to be shared and reproduced
+- Open source software, which can be inspected and potentially improved by anyone in the world
+- An active developer community, which collaborates and self-organizes to build complimentary and modular tools
+]
+
 
 ---
 class: center, middle
 <!-- # Dziękuję -->
 
 .pull-left[
-## O mnie:
+## About me:
 
 Twitter: `r icon::ii_social_twitter()` jakub_nowosad
 
@@ -371,7 +351,7 @@ Email: nowosad.jakub@gmail.com
 ]
 
 .pull-right[
-## Więcej informacji:
+## More info:
 
 https://nowosad.github.io
 
