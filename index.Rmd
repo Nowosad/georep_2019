@@ -1,6 +1,6 @@
 ---
 title: "Reproduciable spatial data analysis:"
-subtitle: "An example of transportation in Bristol"
+subtitle: "An example of transportation analysis for Bristol"
 author: "Jakub Nowosad <br>https://nowosad.github.io"
 date: "Collegium Da Vinci, 2019-01-29, Poznań"
 output:
@@ -175,69 +175,257 @@ class: inverse, center, middle
 ---
 # Introduction
 
+> The purpose of transportation is to overcome space (Rodrigue, Comtois, and Slack 2013)
+
+- Transport involves traversing continuous geographic space between A and B, and infinite localities in between
+- The purpose of geographic transport modeling is simplifying the complexity in a way that captures the essence of transport problems
+- Selecting an appropriate level of geographic analysis can help simplify this complexity
+
 <!-- about transportation -->
 
 ---
 # Introduction
+
+The geographic analysis of transport systems could be done at different geographic levels, including:
+
+- **Areal units**: transport patterns can be understood with reference to zonal aggregates such as the main mode of travel (by car, bike or foot, for example) and average distance of trips made by people living in a particular zone
+- **Desire lines**: straight lines that represent ‘origin-destination’ data that records how many people travel (or could travel) between places (points or zones) in geographic space
+- **Routes**: these are lines representing a path along the route network along the desire lines defined in the previous bullet point
+- **Nodes**: these are points in the transport system that can represent common origins and destinations and public transport stations such as bus stops and rail stations
+- **Route networks**: these represent the system of roads, paths and other linear features in an area. They can be represented as geographic features (representing route segments) or structured as an interconnected graph, with the level of traffic on different segments referred to as ‘flow’ by transport modelers
 
 <!-- different geographic levels -->
 
 ---
 # Bristol
 
+.pull-left[
+- Typically, models are designed to solve a particular problem.
+- Bristol, a city in the west of England, around 30 km east of the Welsh capital Cardiff.
+- Bristol is the 10th largest city council in England, with a population of half a million people
+- In terms of transport, Bristol is well served by rail and road links, and has a relatively high level of active travel. 19% of its citizens cycle and 88% walk at least once per month according to the Active People Survey (the national average is 15% and 81%, respectively). 8% of the population said they cycled work in the 2011 census, compared with only 3% nationwide.
+- Despite impressive walking and cycling statistics, the city has a major congestion problem. Part of the solution is to continue to increase the proportion of trips made by cycling. 
+]
+
+.pull-right[
+```{r, echo=FALSE, out.height=550}
+knitr::include_graphics("figs/bristol.png", dpi = NA)
+```
+]
+
 ---
 # Aims
 
-<!-- explain our aim -->
+.pull-left[
+- For this reason, this chapter is based around a policy scenario, introduced in the next section, that asks: how to increase cycling in the city of Bristol? 
+
+Beyond demonstrating how geocomputation with R can be used to support sustainable transport planning, is to provide evidence for decision-makers in Bristol to decide how best to increase the share of walking and cycling in particular in the city. This high-level aim will be met via the following objectives:
+
+- Describe the geographical pattern of transport behavior in the city.
+- Identify key public transport nodes and routes along which cycling to rail stations could be encouraged, as the first stage in multi-model trips.
+- Analyze travel ‘desire lines’ to, to find where many people drive short distances.
+- Identify cycle route locations that will encourage less car driving and more cycling.
+]
+
+.pull-right[
+```{r, echo=FALSE, out.height=550}
+knitr::include_graphics("figs/bristol.png", dpi = NA)
+```
+]
+
+---
+# Setup
+
+```{r, message=FALSE}
+library(sf)
+library(dplyr)
+library(spDataLarge)
+library(stplanr)      # geographic transport data package
+library(tmap)         # visualization package
+```
 
 ---
 # Transportation zones
 
+- Two zone types will typically be of particular interest: the study region and origin (typically residential areas) and destination (typically containing ‘trip attractors’ such as schools and shops) zones.
+- The origin and destination zones used in this chapter are the same: officially defined zones of intermediate geographic resolution (their official name is Middle layer Super Output Areas or MSOAs). Each houses around 8,000 people.
+
+.lc[
+```{r, echo=FALSE, fig.height=8, message=FALSE}
+tm_shape(bristol_zones) +
+  tm_polygons(legend.show = FALSE, col = "MAP_COLORS", title = "")
+```
+]
+
+.rc[
+```{r, results='asis', echo=FALSE}
+knitr::kable(bristol_od[1:10, ], format = "html")
+```
+]
+
+---
+# Transportation zones
+
+.pull-left[
+```{r}
+zones_origin = bristol_od %>% 
+  group_by(o) %>% 
+  summarize_if(is.numeric, sum) %>% 
+  dplyr::select(geo_code = o, all_origin = all)
+zones_origin
+```
+]
+
+.pull-right[
+```{r}
+zones_dest = bristol_od %>% 
+  group_by(d) %>% 
+  summarize_if(is.numeric, sum) %>% 
+  dplyr::select(geo_code = d, all_dest = all)
+zones_dest
+```
+]
+
+---
+# Transportation zones
+
+```{r}
+zones_origin = left_join(bristol_zones, zones_origin, by = "geo_code")
+```
+
+```{r, echo=FALSE, fig.width=16}
+zones_od = inner_join(zones_origin, zones_dest,
+                      by = "geo_code")
+tm_shape(zones_od) +
+  tm_fill(
+    c("all_origin", "all_dest"),
+    palette = viridis::plasma(4),
+    breaks = c(0, 2000, 4000, 10000, 40000),
+    title = "Trips"
+  )  +
+  tm_borders(col = "black", lwd = 1.5) +
+  tm_facets(free.scales = FALSE, ncol = 2) +
+  tm_layout(panel.labels = c("Zone of origin", "Zone of destination"), panel.label.size = 2, legend.title.size = 2, legend.text.size = 2)
+```
+
 ---
 # Desire lines
+
+- Unlike zones, which represent trip origins and destinations, desire lines connect the centroid of the origin and the destination zone, and thereby represent where people desire to go between zones. They represent the quickest ‘bee line’ or ‘crow flies’ route between A and B that would be taken, if it were not for obstacles such as buildings and windy roads getting in the way
+
+```{r, message=FALSE, warning=FALSE}
+bristol_od$Active = (bristol_od$bicycle + bristol_od$foot) /
+  bristol_od$all * 100
+od_inter = filter(bristol_od, o != d)
+desire_lines = od2line(od_inter, zones_od)
+```
+
+---
+# Desire lines
+
+.lc[
+The map shows that the city center dominates transport patterns in the region, suggesting policies should be prioritized there, although a number of peripheral sub-centers can also be seen. Next it would be interesting to have a look at the distribution of interzonal modes, e.g. between which zones is cycling the least or the most common means of transport. 
+]
+
+.rc[
+```{r}
+tm_shape(desire_lines) +
+  tm_lines(
+    palette = "plasma",
+    breaks = c(0, 5, 10, 20, 40, 100),
+    lwd = "all",
+    scale = 9,
+    title.lwd = "Number of trips",
+    alpha = 0.6,
+    col = "Active",
+    title = "Active travel (%)"
+  ) +
+  tm_lines(lwd = 5, col = "black", alpha = 0.7) +
+  tm_scale_bar()
+```
+]
+
 
 ---
 # Routes
 
+```{r}
+desire_lines$distance = as.numeric(st_length(desire_lines))
+desire_carshort = dplyr::filter(desire_lines, car_driver > 300 & distance < 5000)
+route_carshort = line2route(desire_carshort, route_fun = route_osrm)
+desire_carshort$geom_car = st_geometry(route_carshort)
+```
+
+```{r}
+mapview::mapview(desire_carshort$geom_car)
+```
+
 ---
 # Nodes
+
+```{r}
+mapview::mapview(bristol_stations, legend = FALSE)
+```
+```{r}
+desire_rail = top_n(desire_lines, n = 3, wt = train)
+```
+
+```{r}
+desire_rail = line_via(desire_rail, bristol_stations)
+```
+
+```{r}
+
+```
 
 ---
 # Route networks
 
+```{r}
+summary(bristol_ways)
+ways_freeway = bristol_ways %>% filter(maxspeed == "70 mph") 
+ways_sln = SpatialLinesNetwork(ways_freeway)
+```
+
+```{r}
+ways_sln@sl$e = igraph::edge_betweenness(ways_sln@g)
+tmap_mode("view")
+tm_shape(ways_sln@sl) + 
+  tm_lines(lwd = "e", scale = 25) +
+  tm_layout(legend.show = FALSE)
+```
+
+
 ---
 # Prioritizing new infrastructure
+
+```{r}
+route_rail = desire_rail %>% 
+  st_set_geometry("leg_orig") %>% 
+  line2route(route_fun = route_osrm) %>% 
+  st_set_crs(4326)
+route_cycleway = rbind(route_rail, route_carshort)
+route_cycleway$all = c(desire_rail$all, desire_carshort$all)
+```
+
+```{r, eval=FALSE}
+bristol_stations_top = bristol_stations[desire_rail, , op = st_is_within_distance, dist = 500]
+tm_shape(bristol_ttwa) +
+  tm_borders(col = "darkblue") +
+  tm_shape(bristol_ways) +
+  tm_lines(col = "highway", lwd = 3, palette = c("lightgreen", "grey", "pink")) +
+  tm_scale_bar() +
+  tm_shape(route_cycleway) +
+  tm_lines(col = "blue", lwd = "all", scale = 20, alpha = 0.6) +
+  tm_shape(bristol_stations_top) +
+  tm_dots(size = 0.3, col = "red") +
+tm_layout(legend.position = c("LEFT", "TOP"))
+```
 
 ---
 # Future directions of travel
 
----
-
-<!-- .pull-left[ -->
-<!-- ```{r, echo=FALSE, out.height=550} -->
-<!-- knitr::include_graphics("figs/desire-1.png", dpi = NA) -->
-<!-- ``` -->
-<!-- ] -->
-
-<!-- .pull-right[ -->
-<!-- - Umiejętności tworzenia analiz przestrzennych mogą (powinny?) służyć rozwiązywaniom prawdziwych problemów. -->
-<!-- - Książka zawiera trzy praktyczne przykłady - analizę transportu, geomarketingową oraz ekologiczną. -->
-<!-- - Analiza transportu: w jaki sposób zwiększyć udział ruchu rowerowego w mieście Bristol? -->
-<!-- - Taka analiza obejmuje: -->
-
-<!--     - Jednostki powierzchniowe -->
-<!--     - Linie celu -->
-<!--     - Trasy -->
-<!--     - Węzły -->
-<!--     - Sieci transportowe -->
-
-<!-- -    Areal units: transport patterns can be understood with reference to zonal aggregates such as the main mode of travel (by car, bike or foot, for example) and average distance of trips made by people living in a particular zone, covered in section 12.3. -->
-<!-- -    Desire lines: straight lines that represent ‘origin-destination’ data that records how many people travel (or could travel) between places (points or zones) in geographic space, the topic of section 12.4. -->
-<!-- -    Routes: these are lines representing a path along the route network along the desire lines defined in the previous bullet point. We will see how to create them in section 12.5. -->
-<!-- -    Nodes: these are points in the transport system that can represent common origins and destinations and public transport stations such as bus stops and rail stations, the topic of section 12.6. -->
-<!-- -    Route networks: these represent the system of roads, paths and other linear features in an area and are covered in section 12.7. They can be represented as geographic features (representing route segments) or structured as an interconnected graph, with the level of traffic on different segments referred to as ‘flow’ by transport modelers (Hollander 2016). -->
-]
-
+Methodologically, the foundations presented in this chapter could be extended by including more variables in the analysis. Characteristics of the route such as speed limits, busyness and the provision of protected cycling and walking paths could be linked to ‘mode-split’ (the proportion of trips made by different modes of transport). By aggregating OpenStreetMap data using buffers and geographic data methods presented in Chapters 3 and 4, for example, it would be possible to detect the presence of green space in close proximity to transport routes. Using R’s statistical modeling capabilities, this could then be used to predict current and future levels of cycling, for example.
 
 ---
 class: inverse, center, middle
