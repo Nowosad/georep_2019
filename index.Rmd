@@ -593,14 +593,12 @@ knitr::include_graphics("figs/bc.png")
 ]
 
 .rc[
-- **Fifteen chapters** starting from an introduction to spatial objects in R, going through basic spatial operations, visualizations, bridges with GIS software, spatial machine learning, creating spatial functions, and ending with case studies
-<br>
 
 > Lovelace R., Nowosad J., Muenchow J. 2019, **Geocomputation with R**. CRC Press
 
+- **Fifteen chapters** starting from an introduction to spatial objects in R, going through basic spatial operations, visualizations, bridges with GIS software, spatial machine learning, creating spatial functions, and ending with case studies
 - The online version of this book is free to read at https://geocompr.robinlovelace.net/
 - This book has been also published by CRC Press (http://bit.ly/geocomp_with_r)
-<br>
 ]
 
 ---
