@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Reproduciable spatial data analysis:</title>
+    <title>Reproducible spatial data analysis:</title>
     <meta charset="utf-8">
     <meta name="author" content="Jakub Nowosad  https://nowosad.github.io" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
@@ -25,7 +25,7 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Reproduciable spatial data analysis:
+# Reproducible spatial data analysis:
 ## An example of transportation analysis for Bristol
 ### Jakub Nowosad <br><a href="https://nowosad.github.io" class="uri">https://nowosad.github.io</a>
 ### Collegium Da Vinci, 2019-01-29, Poznań
@@ -78,11 +78,11 @@ class: center, middle, inverse, title-slide
 .pull-left[
 Geocomputation:
 
-- Facilitates the automation of repetitive tasks
-- Enables transparency and reproducibility, the backbone of good scientific practice and data science
-- Encourages software development by providing tools to modify existing functions and implement new ones
-- Helps develop future-proof programming skills which are in high demand in many disciplines and industries
-- Is user-friendly and fast, allowing an efficient workflow
+- Facilitates **the automation of repetitive tasks**
+- Enables **transparency and reproducibility**, the backbone of good scientific practice and data science
+- Encourages **software development** by providing tools to modify existing functions and implement new ones
+- Helps develop **future-proof programming skills** which are in high demand in many disciplines and industries
+- Is **user-friendly and fast**, allowing an efficient workflow
 
 ]
 
@@ -215,7 +215,7 @@ class: inverse, center, middle
 &gt; The purpose of transportation is to overcome space (Rodrigue, Comtois, and Slack 2013)
 
 - Transport involves traversing continuous geographic space between A and B, and infinite localities in between
-- The purpose of geographic transport modeling is simplifying the complexity in a way that captures the essence of transport problems
+- **The purpose of geographic transport modeling is simplifying the complexity in a way that captures the essence of transport problems**
 - Selecting an appropriate level of geographic analysis can help simplify this complexity
 
 &lt;!-- about transportation --&gt;
@@ -239,7 +239,7 @@ The geographic analysis of transport systems could be done at different geograph
 .pull-left[
 Typically, models are designed to solve a particular problem.
 - **Bristol - a city in the west of England with a population of half a million people**
-- In terms of transport, Bristol is well served by rail and road links and has a relatively high level of active travel. 19% of its citizens cycle and 88% walk at least once per month according to the Active People Survey (the national average is 15% and 81%, respectively).
+- In terms of transport, Bristol is well served by rail and road links and has a relatively high level of active travel. 19% of its citizens' cycle and 88% walk at least once per month according to the Active People Survey (the national average is 15% and 81%, respectively).
 - 8% of the population said they cycled work in the 2011 census, compared with only 3% nationwide
 - Despite impressive walking and cycling statistics, **the city has a major congestion problem**
 ]
@@ -258,7 +258,7 @@ This high-level aim will be met via the following objectives:
 
 - Describe the geographical pattern of transport behavior in the city
 - Identify key public transport nodes and routes along which cycling to rail stations could be encouraged, as the first stage in multi-model trips
-- Analyze travel ‘desire lines’ to, to find where many people drive short distances
+- Analyze travel ‘desire lines’, to find where many people drive short distances
 - Identify cycle route locations that will encourage less car driving and more cycling
 ]
 
@@ -531,7 +531,7 @@ route_carshort = line2route(desire_carshort, route_fun = route_osrm)
 # Routes
 
 .pull-left[
-- Plotting the results shows that many short car trips take place in and around Bradley Stoke
+- **Plotting the results shows that many short car trips take place in and around Bradley Stoke**
 - Why? Bradley Stoke is “Europe’s largest new town built with private investment”, suggesting limited public transport provision
 - Furthermore, the town is surrounded by large (cycling unfriendly) road structures, “such as junctions on both the M4 and M5 motorways” 
 ]
@@ -545,7 +545,6 @@ route_carshort = line2route(desire_carshort, route_fun = route_osrm)
 
 .pull-left[
 - Nodes in geographic transport data are zero-dimensional features (points)
-There are two types of transport nodes:
 - From an active travel perspective, public transport ‘legs’ of longer journeys divide trips into three:
 
    * **The origin leg**, typically from residential areas to public transport stations
@@ -648,11 +647,11 @@ route_cycleway$all = c(desire_rail$all,
 # Future directions of travel
 
 .pull-left[
-- The presented foundations presented be extended by including more variables in the analysis
-- Characteristics of the route such as speed limits, busyness and the provision of protected cycling and walking paths could be linked to the proportion of trips made by different modes of transport
-- By aggregating OpenStreetMap data using buffers and geographic data methods, it would be possible to detect the presence of green space in close proximity to transport routes
-- Using R’s statistical modeling capabilities, this could then be used to predict current and future levels of cycling, for example
-- This type of analysis underlies the Propensity to Cycle Tool (PCT), a publicly accessible (see www.pct.bike) mapping tool developed in R that is being used to prioritize investment in cycling across England 
+- **The presented foundations can be extended by including more variables in the analysis**
+- **Characteristics of the route** such as speed limits, busyness and the provision of protected cycling and walking paths **could be linked to the proportion of trips made by different modes of transport**
+- By aggregating OpenStreetMap data using buffers and geographic data methods, **it would be possible to detect the presence of green space in close proximity to transport routes**
+- Using R’s statistical modeling capabilities, this could then be used **to predict current and future levels of cycling**
+- This type of analysis underlies **the Propensity to Cycle Tool (PCT)**, a publicly accessible (see www.pct.bike) mapping tool developed in R that is being used to prioritize investment in cycling across England 
 ]
 .pull-right[
 &lt;img src="figs/pct.png" height="550" style="display: block; margin: auto;" /&gt;
@@ -665,7 +664,7 @@ class: inverse, center, middle
 ---
 # Geomarketing
 
-- A typical example is where to locate a new shop. The aim here is to attract most visitors and, ultimately, make the most profit
+- **A typical example is where to locate a new shop.** The aim here is to attract most visitors and, ultimately, make the most profit
 - There are also many non-commercial applications that can use the technique for public benefit, for example where to locate new health services
 - Typical research questions include what are the target groups, where do target groups live and which areas do they frequent, where are competing stores or services located?
 
